@@ -53,14 +53,14 @@ This repository skips basic programming concepts (loops, basic conditionals, sim
 ## ⚡ Prerequisites & Setup
 
 ### Go Setup
-- **Go version:** `1.21+`
+- **Go version:** `1.27+`
 - **Verify installation:**
   ```bash
   go version
   ```
 
 ### Python Setup
-- **Python version:** `3.11+`
+- **Python version:** `3.15+`
 - **Setup virtual environment:**
   ```bash
   python3 -m venv .venv

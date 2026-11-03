@@ -4,7 +4,7 @@ Welcome to Day 1 of the Senior Polyglot Crash Course. For seasoned developers co
 
 ## 🎯 Senior Mental Model Shift
 
-| Concept | Java / C# / Scala | Go | Python (3.11+) |
+| Concept | Java / C# / Scala | Go | Python (3.15+) |
 | :--- | :--- | :--- | :--- |
 | **Type System** | Nominal (Interfaces explicitly declared with `implements`) | Structural (Implicit interfaces; duck typing via behavior) | Gradual typing (`mypy`) + Structural Subtyping (`Protocol`) |
 | **Memory Allocation** | Heap-allocated objects, GC, hidden pointer dereference | Value vs. Pointer semantics, stack/heap escape analysis | Heap-allocated reference objects; `__slots__` for memory optimization |

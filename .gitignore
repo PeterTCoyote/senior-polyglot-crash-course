@@ -1,7 +1,7 @@
 # === Go ===
 # Binaries for programs and modules
 *.exe
-*.exe;
+*.exe~
 *.dll
 *.so
 *.dylib

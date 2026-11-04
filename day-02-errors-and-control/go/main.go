@@ -28,7 +28,7 @@ type AppError struct {
 
 func (e *AppError) Error() string {
 	if e.Err != nil {
-		return fmt.Sprintf("[%s] code=%d at %s: %v -> caused by: %v", e.Op, e.Code, e.Timestamp.Format(time.RFC3339), e.Err)
+		return fmt.Sprintf("[%s] code=%d at %s: %v", e.Op, e.Code, e.Timestamp.Format(time.RFC3339), e.Err)
 	}
 	return fmt.Sprintf("[%s] code=%d at %s", e.Op, e.Code, e.Timestamp.Format(time.RFC3339))
 }

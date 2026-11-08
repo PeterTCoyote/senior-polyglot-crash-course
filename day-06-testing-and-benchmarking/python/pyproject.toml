@@ -1,0 +1,41 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "day-06-testing-and-benchmarking"
+version = "0.1.0"
+description = "Day 6: Testing, Benchmarking & Tooling for Senior Developers"
+readme = "README.md"
+requires-python = ">=3.15"
+dependencies = [
+    "pytest>=8.0.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["."]
+python_files = ["test_*.py"]
+python_functions = ["test_*"]
+addopts = "-v --strict-markers --tb=short"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "benchmark: marks performance microbenchmarks",
+]
+
+[tool.ruff]
+target-version = "py315"
+line-length = 100
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "W",   # pycodestyle warnings
+    "F",   # pyflakes (syntax, unused imports, undefined variables)
+    "I",   # isort (import ordering)
+    "B",   # flake8-bugbear (common design flaws & gotchas)
+    "UP",  # pyupgrade (modern Python syntax)
+    "SIM", # flake8-simplify
+]
+ignore = [
+    "E501", # line too long (handled by formatter)
+]

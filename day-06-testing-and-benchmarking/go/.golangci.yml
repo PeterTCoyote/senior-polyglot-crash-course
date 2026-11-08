@@ -1,0 +1,49 @@
+# ==============================================================================
+# Production golangci-lint Configuration
+# Senior Translation: Equivalent to Checkstyle + SpotBugs + SonarQube in Java.
+# ==============================================================================
+
+run:
+  timeout: 5m
+  tests: true
+
+linters-settings:
+  govet:
+    enable-all: true
+    disable:
+      - fieldalignment # micro-optimization; enable only for extreme memory layout tuning
+  errcheck:
+    check-type-assertions: true
+    check-blank: true
+  staticcheck:
+    checks: ["all"]
+  gocritic:
+    enabled-tags:
+      - diagnostic
+      - style
+      - performance
+    disabled-checks:
+      - hugeParam
+  revive:
+    rules:
+      - name: exported
+        arguments: [checkPrivateReceivers]
+      - name: package-comments
+      - name: error-naming
+      - name: error-strings
+
+linters:
+  disable-all: true
+  enable:
+    - errcheck     # Verifies no error return values are ignored (unlike Java where unchecked exceptions can be forgotten)
+    - govet        # Official Go compiler AST static analysis
+    - staticcheck  # Advanced bug finding, deprecated API detection, and dead code analysis
+    - gocritic     # Deep diagnostic and performance recommendations
+    - revive       # Fast, extensible replacement for golint with configurable rule sets
+    - prealloc     # Identifies slices that should be preallocated with make([]T, 0, cap) to avoid GC pressure
+    - ineffassign  # Detects ineffectual assignments where values are overwritten without read
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0

@@ -20,9 +20,11 @@ import (
 //   `func BenchmarkXxx(b *testing.B)`
 //
 // Critical Gotchas for Senior Engineers:
-// 1. `b.N` Loop: The Go testing harness automatically scales `b.N` until the benchmark
-//    runs for a stable measurement window (typically 1 second).
-// 2. `b.ResetTimer()`: Reset the timer AFTER costly setups to isolate the code under test.
+// 1. Modern `for b.Loop()` (Go 1.24+ & Go 1.27): Replaces the legacy `for i := 0; i < b.N; i++`.
+//    `b.Loop()` automatically controls iteration scaling AND resets the benchmark timer on the
+//    first iteration, eliminating the need to manually call `b.ResetTimer()` after setup code!
+// 2. Legacy `b.N` Loop: In pre-Go 1.24 codebases, you will see `for i := 0; i < b.N; i++` with
+//    manual `b.ResetTimer()`.
 // 3. Compiler Dead Code Elimination: If you don't use the return value, the Go compiler's
 //    escape analysis / optimizer might eliminate the function call entirely!
 //    In JMH you use `Blackhole.consume()`. In Go, assign to a package-level variable.
@@ -48,9 +50,9 @@ func BenchmarkValidateOrder(b *testing.B) {
 	}
 
 	b.ReportAllocs() // Report B/op and allocs/op
-	b.ResetTimer()   // Exclude initialization overhead
+	// Exclude initialization overhead
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		// Assign to global sink to defeat compiler dead code elimination
 		sinkErr = svc.ValidateOrder(validOrder)
 	}
@@ -82,9 +84,9 @@ func BenchmarkProcessPayment_IdempotencyCacheHit(b *testing.B) {
 	ctx := context.Background()
 
 	b.ReportAllocs()
-	b.ResetTimer()
+	// Note: b.ResetTimer() is no longer needed here; b.Loop() resets the timer automatically on entry!
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		sinkReceipt, sinkErr = svc.ProcessPayment(ctx, order)
 	}
 }
@@ -98,9 +100,8 @@ func BenchmarkStore_Comparative(b *testing.B) {
 	b.Run("ReadContention_SingleKey", func(b *testing.B) {
 		_ = store.Put("read-key", &service.Receipt{TransactionID: "tx1"})
 		b.ReportAllocs()
-		b.ResetTimer()
 
-		for i := 0; i < b.N; i++ {
+		for b.Loop() {
 			sinkReceipt, _ = store.Get("read-key")
 		}
 	})
@@ -108,11 +109,12 @@ func BenchmarkStore_Comparative(b *testing.B) {
 	// Sub-benchmark 2: Writes with Unique Keys
 	b.Run("Sequential_Writes", func(b *testing.B) {
 		b.ReportAllocs()
-		b.ResetTimer()
 
-		for i := 0; i < b.N; i++ {
+		i := 0
+		for b.Loop() {
 			key := fmt.Sprintf("bench-key-%d", i)
 			sinkErr = store.Put(key, &service.Receipt{TransactionID: key})
+			i++
 		}
 	})
 }

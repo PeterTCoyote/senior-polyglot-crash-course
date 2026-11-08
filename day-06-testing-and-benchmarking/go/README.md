@@ -139,17 +139,21 @@ In Go, benchmarking is built into the standard `testing` library:
 var sinkReceipt *service.Receipt // Global sink to defeat dead code elimination
 
 func BenchmarkProcessPayment(b *testing.B) {
-    // Setup phase (excluded from timer)
+    // Setup phase: executed before timing starts
     svc := setupService()
-
     b.ReportAllocs() // Reports B/op and allocs/op
-    b.ResetTimer()   // Exclude initialization time
 
-    for i := 0; i < b.N; i++ {
+    // Modern Go 1.24+ & 1.27: for b.Loop()
+    // Automatically starts/resets the timer on the first iteration!
+    for b.Loop() {
         sinkReceipt, _ = svc.ProcessPayment(ctx, order)
     }
 }
 ```
+
+### The Evolution: `for b.Loop()` vs Legacy `b.N`
+* **Go 1.24+ (`for b.Loop()`):** The modern, idiomatic standard. `b.Loop()` automatically controls iteration scaling and **resets the timer on entry**, which eliminates the need to manually call `b.ResetTimer()` after setup code.
+* **Pre-Go 1.24 (`for i := 0; i < b.N; i++`):** The legacy pattern. Required an explicit `b.ResetTimer()` after any setup logic; otherwise, setup time was averaged into each iteration.
 
 ### The Dead Code Elimination Trap (Go's `Blackhole`)
 If you call a function inside `b.N` but discard its return value, the Go compiler's escape analysis and dead code eliminator can optimize away the call entirely.
